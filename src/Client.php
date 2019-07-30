@@ -33,8 +33,12 @@ class Client
     {
         $this->uri = $uri;
         $host = $uri->getHost();
-        $port = $uri->getPort();
         $ssl = $uri->getScheme() === 'wss';
+        if ($ssl) {
+            $port = $uri->getPort() ?: 443;
+        } else {
+            $port = $uri->getPort() ?: 80;
+        }
 
         $this->client = new Coroutine\Http\Client($host, $port, $ssl);
 
