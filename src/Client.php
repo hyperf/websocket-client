@@ -29,7 +29,7 @@ class Client
      */
     protected $client;
 
-    public function __construct(UriInterface $uri, $autoUpgrade = false)
+    public function __construct(UriInterface $uri, bool $autoUpgrade = false)
     {
         $this->uri = $uri;
         $host = $uri->getHost();
@@ -61,6 +61,21 @@ class Client
             $errCode = $this->client->errCode;
             throw new ConnectException(sprintf('Websocket upgrade failed by [%s] [%s].', $errCode, swoole_strerror($errCode)));
         }
+    }
+
+    public function set(array $setting)
+    {
+        $this->client->set($setting);
+    }
+
+    public function setHeaders(array $headers)
+    {
+        $this->client->setHeaders($headers);
+    }
+
+    public function getUri(): UriInterface
+    {
+        return $this->uri;
     }
 
     public function __destruct()
