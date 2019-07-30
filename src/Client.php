@@ -29,7 +29,7 @@ class Client
      */
     protected $client;
 
-    public function __construct(UriInterface $uri)
+    public function __construct(UriInterface $uri, $autoUpgrade = false)
     {
         $this->uri = $uri;
         $host = $uri->getHost();
@@ -42,15 +42,22 @@ class Client
 
         $this->client = new Coroutine\Http\Client($host, $port, $ssl);
 
-        parse_str($this->uri->getQuery(), $query);
+        if ($autoUpgrade) {
+            $this->upgrade();
+        }
+    }
 
-        $query = http_build_query($query);
+    public function upgrade(?string $path = null)
+    {
+        if (null === $path) {
+            parse_str($this->uri->getQuery(), $query);
 
-        $path = $this->uri->getPath() ?: '/';
-        $path = empty($query) ? $path : $path . '?' . $query;
-
+            $query = http_build_query($query);
+            $path = $this->uri->getPath() ?: '/';
+            $path = empty($query) ? $path : $path . '?' . $query;
+        }
         $ret = $this->client->upgrade($path);
-        if (! $ret) {
+        if (!$ret) {
             $errCode = $this->client->errCode;
             throw new ConnectException(sprintf('Websocket upgrade failed by [%s] [%s].', $errCode, swoole_strerror($errCode)));
         }
