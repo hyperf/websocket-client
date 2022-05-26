@@ -29,7 +29,7 @@ class Client
      */
     protected $client;
 
-    public function __construct(UriInterface $uri)
+    public function __construct(UriInterface $uri, array $options = [])
     {
         $this->uri = $uri;
         $host = $uri->getHost();
@@ -41,6 +41,8 @@ class Client
         }
 
         $this->client = new Coroutine\Http\Client($host, $port, $ssl);
+
+        $this->client->set($options);
 
         parse_str($this->uri->getQuery(), $query);
 
@@ -89,5 +91,10 @@ class Client
     public function close(): bool
     {
         return $this->client->close();
+    }
+
+    public function isConnected(): bool
+    {
+        return $this->client->connected;
     }
 }
