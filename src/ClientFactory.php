@@ -16,12 +16,12 @@ use Hyperf\Utils\Str;
 
 class ClientFactory
 {
-    public function create(string $uri, bool $autoClose = true): Client
+    public function create(string $uri, array $headers = [], bool $autoClose = true): Client
     {
         if (! Str::startsWith($uri, ['ws://', 'wss://'])) {
             $uri = 'ws://' . $uri;
         }
-        $client = make(Client::class, ['uri' => new Uri($uri)]);
+        $client = make(Client::class, ['uri' => new Uri($uri),  'headers' => $headers]);
         if ($autoClose) {
             defer(function () use ($client) {
                 $client->close();

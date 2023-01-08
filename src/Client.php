@@ -21,8 +21,11 @@ class Client
 {
     protected Coroutine\Http\Client $client;
 
-    public function __construct(protected UriInterface $uri)
+    protected $uri;
+
+    public function __construct(UriInterface $uri, array $headers = [])
     {
+        $this->uri = $uri;
         $host = $uri->getHost();
         $port = $uri->getPort();
         $ssl = $uri->getScheme() === 'wss';
@@ -32,6 +35,8 @@ class Client
         }
 
         $this->client = new Coroutine\Http\Client($host, $port, $ssl);
+
+        $headers && $this->client->setHeaders($headers);
 
         parse_str($this->uri->getQuery(), $query);
 
